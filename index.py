@@ -32,7 +32,7 @@ def random_sleep():
 
 # 检查商品详情页是否包含指定关键词
 def check_availability(content):
-    if "Currently unavailable" in content:
+    if "if this item will be back" in content:
         return True
     else:
         return False
