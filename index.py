@@ -3,7 +3,9 @@ import random
 import time
 import grequests
 import requests
+import sqlite3
 import sys
+import datetime
 
 
 # 设置 headers
@@ -36,6 +38,23 @@ def check_availability(content):
         return True
     else:
         return False
+    
+
+# 获取配置信息，赋值给全局变量
+def assign_global_values():
+    # 连接到sqlite数据库
+    conn = sqlite3.connect('inputs.db')
+    c = conn.cursor()
+    
+    # 从inputs表中检索最近保存的cookie
+    c.execute("SELECT proxy FROM setting ORDER BY ROWID DESC LIMIT 1")
+    result = c.fetchone()
+    proxy = result[0]
+    global proxies
+    proxies = {
+        "http": proxy,
+        "https": proxy,
+    }
 
 
 # 按照类别查找包含“currently unavailable”的商品页面链接
@@ -79,11 +98,20 @@ def get_total_page(content):
     # page = soup.find_all("div", {"data-component-type": "s-search-result"})
     
     return 6
-    
+
+
+def get_filepath():
+    conn = sqlite3.connect('inputs.db')
+    c = conn.cursor()   
+    # 从inputs表中检索最近保存的cookie
+    c.execute("SELECT filepath FROM setting ORDER BY ROWID DESC LIMIT 1")
+    result = c.fetchone()
+    filepath = result[0]
+    return filepath
+
 
 def scrapy_items(category):
     total_links = []
-
     page = get_total_page()
     # 循环页面抓取商品
     for i in range(1, page):
@@ -107,7 +135,12 @@ def scrapy_items(category):
                 result_links.append(response.url)
 
     print(result_links)
-    with open("result.txt", "w") as outfile:
+    
+    path = get_filepath()
+    now = datetime.datetime.now()
+    file_name = "log_{}.txt".format(now.strftime("%Y-%m-%d_%H-%M-%S"))
+    file = path + file_name
+    with open(file, "w") as outfile:
         outfile.write("\n".join(result_links))
 
 
