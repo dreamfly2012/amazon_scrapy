@@ -65,6 +65,35 @@ def search_items(category, page):
         item_links.append("https://www.amazon.com" + a["href"])
     return item_links
 
+
+def scrapy_items(category, page):
+    total_links = []
+
+    # 循环页面抓取商品
+    for i in range(1, page):
+        item_links = search_items(category, i)
+        total_links.extend(item_links)
+        random_sleep()
+
+    result_links = []
+
+    if not total_links:
+        print("failed to scrapy")
+
+    rs = (grequests.get(u, headers=headers, proxies=proxies) for u in total_links)
+
+    responses = grequests.map(rs, size=10)
+
+    # Iterate over the responses and print the results.
+    for response in responses:
+        if response is not None:
+            if check_availability(response.text):
+                result_links.append(response.url)
+
+    print(result_links)
+    with open("result.txt", "w") as outfile:
+        outfile.write("\n".join(result_links))
+
 if __name__ == "__main__":
     # 测试
     category = "chairs"  # 请将此处替换为您感兴趣的商品类别
