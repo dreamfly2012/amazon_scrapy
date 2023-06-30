@@ -1,3 +1,4 @@
+import os
 from bs4 import BeautifulSoup
 import random
 import time
@@ -85,7 +86,7 @@ def search_items(category, page):
     return item_links
 
 #TODO get max page
-def get_total_page(content):
+def get_total_page(category):
     # url = f"https://www.amazon.com/s?k={category}"
     # response = requests.get(url, headers=headers, proxies=proxies)
     
@@ -110,9 +111,18 @@ def get_filepath():
     return filepath
 
 
+def write_log(result_links):
+    dir_path = get_filepath()
+    now = datetime.datetime.now()
+    file_name = "log_{}.txt".format(now.strftime("%Y-%m-%d_%H-%M-%S"))
+    file_path = os.path.join(dir_path, file_name)
+  
+    with open(file_path, "w") as outfile:
+        outfile.write("\n".join(result_links))
+
 def scrapy_items(category):
     total_links = []
-    page = get_total_page()
+    page = get_total_page(category)
     # 循环页面抓取商品
     for i in range(1, page):
         item_links = search_items(category, i)
@@ -136,12 +146,8 @@ def scrapy_items(category):
 
     print(result_links)
     
-    path = get_filepath()
-    now = datetime.datetime.now()
-    file_name = "log_{}.txt".format(now.strftime("%Y-%m-%d_%H-%M-%S"))
-    file = path + file_name
-    with open(file, "w") as outfile:
-        outfile.write("\n".join(result_links))
+    write_log(result_links)
+    
 
 
 if __name__ == "__main__":

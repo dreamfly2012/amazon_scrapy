@@ -1,3 +1,4 @@
+import os
 import unittest
 import sys
 
@@ -47,6 +48,17 @@ class IndexTest(unittest.TestCase):
                 result += line
 
         logging.info(result)
+
+    def test_write_log(self):
+        result_links = []
+        index.write_log(result_links)
+        
+    def test_path_join(self):
+        dir_path = '/user/documents'
+        file_name = 'example.txt'
+
+        file_path = os.path.join(dir_path, file_name)
+        logging.info(file_path)
         
     def test_deliver_to(self):
         url = 'https://www.amazon.com/dp/B0735WMNT5'

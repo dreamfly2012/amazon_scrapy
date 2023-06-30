@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import sqlite3
 import index
 
@@ -88,7 +89,7 @@ def show_cookie_input():
     popup = tk.Toplevel()
     popup.title("Cookie Input")
     # 设置窗口的大小和位置
-    popup.geometry("400x200+200+200")
+    popup.geometry("800x600+200+200")
 
     # 连接到sqlite数据库
     conn = sqlite3.connect("inputs.db")
@@ -100,19 +101,19 @@ def show_cookie_input():
 
     # 创建一个输入框，用于用户输入cookie信息
     cookie_label = tk.Label(popup, text="Cookie:")
-    cookie_label.grid(row=0, column=0, padx=10, pady=10, ipadx=60)
-    cookie_entry = tk.Entry(popup)
-    cookie_entry.grid(row=0, column=1, ipady=50)
+    cookie_label.grid(row=0, column=0,ipadx=50,ipady=50)
+    cookie_text = tk.Text(popup)
+    cookie_text.grid(row=0, column=1, ipady=20,ipadx=10)
 
     # 如果有最近保存的cookie，则在输入框中显示它
     if result is not None:
-        cookie_entry.insert(tk.END, result[0])
+        cookie_text.insert(tk.END, result[0])
 
     # 创建一个按钮，用于保存用户输入并关闭弹出窗口
     save_button = tk.Button(
-        popup, text="Save", command=lambda: save_cookie_input(popup, cookie_entry.get())
+        popup, text="Save", command=lambda: save_cookie_input(popup, cookie_text.get(1.0,tk.END))
     )
-    save_button.grid(row=1, column=0, columnspan=2)
+    save_button.grid(row=1, column=0, columnspan=2,ipadx=60,ipady=40,pady=30)
 
 
 def save_cookie_input(popup, cookie):
@@ -133,6 +134,9 @@ def crawl(keyword):
     index.assign_global_values()
     # 在此处编写爬虫代码
     index.scrapy_items(keyword)
+    
+    messagebox.showinfo("Message", "爬虫完毕")
+
     pass
 
 
