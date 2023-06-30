@@ -1,3 +1,4 @@
 requests
 grequests
 bs4
+pyinstaller
