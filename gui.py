@@ -20,7 +20,7 @@ def save_file():
         conn.close()
 
 
-def save_inputs(proxy, cookie, keyword):
+def save_inputs(proxy, cookie, header, keyword):
     # 连接到sqlite数据库
     conn = sqlite3.connect("inputs.db")
     c = conn.cursor()
@@ -28,11 +28,13 @@ def save_inputs(proxy, cookie, keyword):
     # 创建一个保存输入的表
     c.execute(
         """CREATE TABLE IF NOT EXISTS inputs
-                 (proxy TEXT, cookie TEXT, keyword TEXT)"""
+                 (proxy TEXT, cookie TEXT, header TEXT, keyword TEXT)"""
     )
 
     # 插入用户输入到表中
-    c.execute("INSERT INTO inputs VALUES (?, ?, ?)", (proxy, cookie, keyword))
+    c.execute(
+        "INSERT INTO inputs VALUES (?, ?, ?, ? )", (proxy, cookie, header, keyword)
+    )
 
     # 提交更改并关闭连接
     conn.commit()
@@ -101,9 +103,9 @@ def show_cookie_input():
 
     # 创建一个输入框，用于用户输入cookie信息
     cookie_label = tk.Label(popup, text="Cookie:")
-    cookie_label.grid(row=0, column=0,ipadx=50,ipady=50)
+    cookie_label.grid(row=0, column=0, ipadx=50, ipady=50)
     cookie_text = tk.Text(popup)
-    cookie_text.grid(row=0, column=1, ipady=20,ipadx=10)
+    cookie_text.grid(row=0, column=1, ipady=20, ipadx=10)
 
     # 如果有最近保存的cookie，则在输入框中显示它
     if result is not None:
@@ -111,9 +113,11 @@ def show_cookie_input():
 
     # 创建一个按钮，用于保存用户输入并关闭弹出窗口
     save_button = tk.Button(
-        popup, text="Save", command=lambda: save_cookie_input(popup, cookie_text.get(1.0,tk.END))
+        popup,
+        text="Save",
+        command=lambda: save_cookie_input(popup, cookie_text.get(1.0, tk.END)),
     )
-    save_button.grid(row=1, column=0, columnspan=2,ipadx=60,ipady=40,pady=30)
+    save_button.grid(row=1, column=0, columnspan=2, ipadx=60, ipady=40, pady=30)
 
 
 def save_cookie_input(popup, cookie):
@@ -129,12 +133,59 @@ def save_cookie_input(popup, cookie):
     popup.destroy()
 
 
+def show_header_input():
+    # 创建一个弹出窗口
+    popup = tk.Toplevel()
+    popup.title("Header Settinng")
+    # 设置窗口的大小和位置
+    popup.geometry("800x600+200+200")
+
+    # 连接到sqlite数据库
+    conn = sqlite3.connect("inputs.db")
+    c = conn.cursor()
+
+    # 从inputs表中检索最近保存的header
+    c.execute("SELECT header FROM setting ORDER BY ROWID DESC LIMIT 1")
+    result = c.fetchone()
+
+    # 创建一个输入框，用于用户输入header信息
+    header_label = tk.Label(popup, text="header:")
+    header_label.grid(row=0, column=0, ipadx=50, ipady=50)
+    header_text = tk.Text(popup)
+    header_text.grid(row=0, column=1, ipady=20, ipadx=10)
+
+    # 如果有最近保存的header，则在输入框中显示它
+    if result is not None:
+        header_text.insert(tk.END, result[0])
+
+    # 创建一个按钮，用于保存用户输入并关闭弹出窗口
+    save_button = tk.Button(
+        popup,
+        text="Save",
+        command=lambda: save_header_input(popup, header_text.get(1.0, tk.END)),
+    )
+    save_button.grid(row=1, column=0, columnspan=2, ipadx=60, ipady=40, pady=30)
+
+
+def save_header_input(popup, header):
+    # 保存header信息到sqlite数据库
+    conn = sqlite3.connect("inputs.db")
+    c = conn.cursor()
+    # 更新header信息
+    c.execute("UPDATE setting SET header = ?", (header,))
+    conn.commit()
+    conn.close()
+
+    # 关闭弹出窗口
+    popup.destroy()
+
+
 def crawl(keyword):
     # 赋值proxy
     index.assign_global_values()
     # 在此处编写爬虫代码
     index.scrapy_items(keyword)
-    
+
     messagebox.showinfo("Message", "爬虫完毕")
 
     pass
@@ -185,6 +236,10 @@ settings_menu.add_command(label="Proxy Settings", command=show_proxy_input)
 
 # 在“设置”菜单中添加一个“Cookie设置”选项
 settings_menu.add_command(label="Cookie Settings", command=show_cookie_input)
+
+# 在“设置”菜单中添加一个“Header设置”选项
+settings_menu.add_command(label="Header Settings", command=show_header_input)
+
 
 # 在“设置”菜单中添加一个“文件路径设置”选项
 settings_menu.add_command(label="FilePath Settings", command=save_file)
