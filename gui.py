@@ -1,9 +1,41 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
+from tkinter import ttk
 import sqlite3
 import index
+import sys
 
+
+def create_table(window):
+    # 创建一个带有滚动条的框架
+    frame = ttk.Frame(window)
+    frame.grid(row=2, columnspan=2, sticky='nsew')
+
+    # 创建一个可滚动的垂直滚动条
+    scrollbar = ttk.Scrollbar(frame)
+    scrollbar.pack(side='right', fill='y')
+
+    # 创建一个表格控件
+    table = ttk.Treeview(frame, yscrollcommand=scrollbar.set)
+    table.pack(fill='both', expand=True)
+
+    # 添加列标题
+    table['columns'] = ('Name', 'Age')
+    table.heading('#0', text='ID')
+    table.column('#0', width=50, anchor='center')
+    table.heading('Name', text='Name')
+    table.column('Name', width=150, anchor='center')
+    table.heading('Age', text='Age')
+    table.column('Age', width=80, anchor='center')
+
+    # 添加示例数据
+    for i in range(100):
+        table.insert(parent='', index='end', iid=i, text=str(i),
+                     values=('Name' + str(i), str(20 + i)))
+
+    # 配置滚动条与表格的关联
+    scrollbar.config(command=table.yview)
 
 def save_file():
     # 弹出保存文件路径对话框
@@ -108,7 +140,8 @@ def show_cookie_input():
     cookie_text.grid(row=0, column=1, ipady=20, ipadx=10)
 
     # 如果有最近保存的cookie，则在输入框中显示它
-    if result is not None:
+    
+    if result[0] is not None:
         cookie_text.insert(tk.END, result[0])
 
     # 创建一个按钮，用于保存用户输入并关闭弹出窗口
@@ -155,7 +188,7 @@ def show_header_input():
     header_text.grid(row=0, column=1, ipady=20, ipadx=10)
 
     # 如果有最近保存的header，则在输入框中显示它
-    if result is not None:
+    if result[0] is not None:
         header_text.insert(tk.END, result[0])
 
     # 创建一个按钮，用于保存用户输入并关闭弹出窗口
@@ -243,6 +276,9 @@ settings_menu.add_command(label="Header Settings", command=show_header_input)
 
 # 在“设置”菜单中添加一个“文件路径设置”选项
 settings_menu.add_command(label="FilePath Settings", command=save_file)
+
+
+create_table(window)
 
 # 运行窗口
 window.mainloop()
