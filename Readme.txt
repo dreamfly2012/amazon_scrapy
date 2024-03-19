@@ -1,3 +1,21 @@
+# 亚马逊搜索爬虫(抓取Currently unavailable.)
+
+## 虚拟环境配置
+
+**创建** 
+
+```bash
+python -m venv venv
+```
+
+**激活**
+
+```bash
+cd venv/scripts
+./activate(windows) or source activate(linux or mac)
+```
+
+
 ## 环境配置
 
 配置阿里云镜像源

@@ -15,7 +15,8 @@ import datetime
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.1945.0",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
-    "Origin":"https://www.amazon.com"
+    "Origin":"https://www.amazon.com",
+    "Cookie":'csm-sid=497-8476988-7370720; x-amz-captcha-1=1710862803147405; x-amz-captcha-2=ZwQvUP47W4a1V05tvFPyGA==; session-id=147-8766007-3860244; session-id-time=2082787201l; i18n-prefs=USD; sp-cdn="L5Z9:FR"; skin=noskin; ubid-main=132-9469537-9901663; session-token=7dn5W4mvqXFNO1Wt2/AVb9gwiKGC1vxoZt38RIDA7A3+w7j4zg1VEr5t2GoXW8LTQXKgrfblhK3NqxVdxZoN/QhQiK6FIVDdVt6xnmt8qR+B9MVGR7pE6khcZd8ecVYU0s6LZ106Ao7Tdq0H9H2m/af7WIW/upDNED7jgzbskjeJXSTVkyusxtuorm30yThavo+w8SFuM1L0mlIrOX3kfMcb+kvMo4+6fQfKHiQaaNhhOYkrB6pmvOcqwy57UWsefoYHpRswWwrIeKH2YxNQK0XayUmmmrYQm53Kwg4qLVviKIE1PeMZJkYmZOq53uAfK3xoO0sjp0KZ07a/CVBzvt/YY6RRVO3I; ext_pgvwcount=0.9; csm-hit=tb:WY3PRMXD2QKRSMPGRXE4+s-QJMK65G8JY35MRG4PEA6|1710855680258&t:1710855680258&adb:adblk_yes',
 }
 
 # 设置代理服务器
@@ -64,6 +65,8 @@ def search_items(category, page):
     # url = f"https://www.amazon.com/s?k=children&i=stripbooks&crid=1L9OYESEPZ0XQ&sprefix=child%2Cstripbooks%2C1188&ref=nb_sb_noss_2"
 
     response = requests.get(url, headers=headers, proxies=proxies)
+
+    print(response)
     
     if response.status_code != 200:
         print("request failed")
@@ -108,11 +111,19 @@ def get_filepath():
     c.execute("SELECT filepath FROM setting ORDER BY ROWID DESC LIMIT 1")
     result = c.fetchone()
     filepath = result[0]
-    return filepath
+    ## 判断路径是否存在
+    if filepath and os.path.exists(filepath):
+        return filepath
+    else:
+        return None
+   
 
 
 def write_log(result_links):
     dir_path = get_filepath()
+    if dir_path is None:
+        print("No directory found")
+        sys.exit()
     now = datetime.datetime.now()
     file_name = "log_{}.txt".format(now.strftime("%Y-%m-%d_%H-%M-%S"))
     file_path = os.path.join(dir_path, file_name)

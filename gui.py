@@ -21,13 +21,13 @@ def create_table(window):
     table.pack(fill='both', expand=True)
 
     # 添加列标题
-    table['columns'] = ('Name', 'Age')
+    table['columns'] = ('Name', 'Url')
     table.heading('#0', text='ID')
     table.column('#0', width=50, anchor='center')
     table.heading('Name', text='Name')
     table.column('Name', width=150, anchor='center')
-    table.heading('Age', text='Age')
-    table.column('Age', width=80, anchor='center')
+    table.heading('Url', text='Url')
+    table.column('Url', width=80, anchor='center')
 
     # 添加示例数据
     for i in range(100):
